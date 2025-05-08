@@ -32,9 +32,8 @@ class StoreRoomRequest extends FormRequest
             if (!Room::isValidAccommodation($type, $acc)) {
                 $validator->errors()->add('accommodation', 'Acomodación no válida para el tipo de habitación seleccionado.');
             }
-
-            $hotelId = $this->route('hotel');
-            $hotel = Hotel::find($hotelId);
+            $hotel = $this->route('hotel'); // Esto es un objeto Hotel
+            $hotelId = $hotel->id;
 
             if (!$hotel) {
                 $validator->errors()->add('hotel', 'El hotel especificado no existe.');
