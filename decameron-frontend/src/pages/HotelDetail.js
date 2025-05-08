@@ -4,6 +4,7 @@ import { HotelForm } from '../components/HotelForm';
 import { RoomForm } from '../components/RoomForm';
 import { RoomList } from '../components/RoomList';
 import { getHotel, updateHotel, getRooms, createRoom, deleteRoom } from '../api/hotelsApi';
+import { nanoid } from 'nanoid';
 
 export const HotelDetail = () => {
     const { id } = useParams();
@@ -22,7 +23,8 @@ export const HotelDetail = () => {
                     getRooms(id)
                 ]);
                 setHotel(hotelResponse.data);
-                setRooms(roomsResponse.data);
+                setRooms(roomsResponse.data.rooms);
+
             } catch (err) {
                 setError(err.message);
             } finally {
@@ -45,7 +47,14 @@ export const HotelDetail = () => {
     const handleRoomCreate = async (values) => {
         try {
             const response = await createRoom(id, values);
-            setRooms([...rooms, response.data]);
+            const roomData = response.data;
+
+            // Si no viene ID, le creamos uno temporal
+            if (!roomData.id) {
+                roomData.id = nanoid();
+            }
+
+            setRooms([...rooms, roomData]);
             setShowRoomForm(false);
         } catch (err) {
             setError(err.response?.data?.message || 'Error al agregar la habitación');

@@ -2,19 +2,25 @@ import { Formik, Form, Field, ErrorMessage } from 'formik';
 import * as Yup from 'yup';
 import { validateRoomAssignment, validateTotalRooms } from './Validations';
 
-const RoomSchema = Yup.object().shape({
+const RoomSchema = Yup.object({
     type: Yup.string().required('Tipo es requerido'),
-    accommodation: Yup.string().required('Acomodación es requerida'),
+    accommodation: Yup.string()
+        .nullable()
+        .when('type', {
+            is: (val) => val && val !== '', // Solo si type tiene valor no vacío
+            then: (schema) => schema.required('Acomodación es requerida'),
+            otherwise: (schema) => schema.notRequired(),
+        }),
     quantity: Yup.number()
         .min(1, 'Debe ser al menos 1')
-        .required('Cantidad es requerida')
+        .required('Cantidad es requerida'),
 });
 
 export const RoomForm = ({ hotel, onSubmit, onCancel }) => {
     const initialValues = {
         type: '',
         accommodation: '',
-        quantity: 1
+        quantity: 1,
     };
 
     return (
@@ -40,7 +46,14 @@ export const RoomForm = ({ hotel, onSubmit, onCancel }) => {
                 <Form className="room-form">
                     <div className="form-group">
                         <label>Tipo de Habitación</label>
-                        <Field as="select" name="type">
+                        <Field
+                            as="select"
+                            name="type"
+                            onChange={(e) => {
+                                setFieldValue('type', e.target.value);
+                                setFieldValue('accommodation', ''); // Limpiar acomodación al cambiar tipo
+                            }}
+                        >
                             <option value="">Seleccione un tipo</option>
                             <option value="ESTANDAR">Estándar</option>
                             <option value="JUNIOR">Junior</option>
@@ -51,8 +64,10 @@ export const RoomForm = ({ hotel, onSubmit, onCancel }) => {
 
                     <div className="form-group">
                         <label>Acomodación</label>
-                        <Field as="select" name="accommodation">
-                            <option value="">Seleccione una acomodación</option>
+                        <Field as="select" name="accommodation" disabled={!values.type}>
+                            <option value="">
+                                {values.type ? 'Seleccione una acomodación' : 'Seleccione un tipo primero'}
+                            </option>
                             {values.type === 'ESTANDAR' && (
                                 <>
                                     <option value="SENCILLA">Sencilla</option>
@@ -84,7 +99,9 @@ export const RoomForm = ({ hotel, onSubmit, onCancel }) => {
 
                     <div className="form-actions">
                         <button type="submit">Agregar Habitación</button>
-                        <button type="button" onClick={onCancel}>Cancelar</button>
+                        <button type="button" onClick={onCancel}>
+                            Cancelar
+                        </button>
                     </div>
                 </Form>
             )}

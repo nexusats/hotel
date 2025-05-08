@@ -13,8 +13,7 @@ export const HotelList = ({ hotels }) => {
                         <p><strong>Ciudad:</strong> {hotel.city}</p>
                         <p><strong>Dirección:</strong> {hotel.address}</p>
                         <p><strong>NIT:</strong> {hotel.nit}</p>
-                        <p><strong>Habitaciones:</strong> {hotel.rooms_count || 0} / {hotel.total_rooms}</p>
-
+                        <p><strong>Habitaciones:</strong> {hotel.rooms?.reduce((sum, room) => sum + room.quantity, 0) || 0} / {hotel.total_rooms}</p>
                         <Link to={`/hotels/${hotel.id}`} className="btn-details">
                             Ver Detalles
                         </Link>

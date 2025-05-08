@@ -1,5 +1,4 @@
 export const RoomList = ({ rooms, hotel, onDelete }) => {
-    // Asegurar que rooms sea un array
     const safeRooms = Array.isArray(rooms) ? rooms : [];
     const totalRooms = safeRooms.reduce((sum, room) => sum + room.quantity, 0);
     const availableRooms = hotel.total_rooms - totalRooms;
@@ -19,18 +18,22 @@ export const RoomList = ({ rooms, hotel, onDelete }) => {
                     </tr>
                 </thead>
                 <tbody>
-                    {safeRooms.map(room => (
-                        <tr key={room.id}>
+                    {safeRooms.map((room, index) => (
+                        <tr key={room.id ?? `${room.type}-${room.accommodation}-${index}`}>
                             <td>{room.quantity}</td>
                             <td>{room.type}</td>
                             <td>{room.accommodation}</td>
                             <td>
-                                <button
-                                    onClick={() => onDelete(room.id)}
-                                    className="btn-delete"
-                                >
-                                    Eliminar
-                                </button>
+                                {room.id ? (
+                                    <button
+                                        onClick={() => onDelete(room.id)}
+                                        className="btn-delete"
+                                    >
+                                        Eliminar
+                                    </button>
+                                ) : (
+                                    <span>Guardando...</span>
+                                )}
                             </td>
                         </tr>
                     ))}
