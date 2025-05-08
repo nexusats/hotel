@@ -22,8 +22,7 @@ export const HotelDetail = () => {
                     getRooms(id)
                 ]);
                 setHotel(hotelResponse.data);
-                // Asegurarse de que rooms sea siempre un array
-                setRooms(Array.isArray(roomsResponse.data) ? roomsResponse.data : []);
+                setRooms(roomsResponse.data);
             } catch (err) {
                 setError(err.message);
             } finally {
@@ -92,9 +91,7 @@ export const HotelDetail = () => {
 
                 {showRoomForm && (
                     <RoomForm
-                        hotelId={hotel.id}
-                        totalRooms={hotel.total_rooms}
-                        existingRooms={rooms}
+                        hotel={hotel}
                         onSubmit={handleRoomCreate}
                         onCancel={() => setShowRoomForm(false)}
                     />
@@ -102,7 +99,7 @@ export const HotelDetail = () => {
 
                 <RoomList
                     rooms={rooms}
-                    totalRoomsAllowed={hotel.total_rooms}
+                    hotel={hotel}
                     onDelete={handleRoomDelete}
                 />
             </div>

@@ -8,7 +8,5 @@ export const createHotel = (hotel) => axios.post(`${API_URL}/hotels`, hotel);
 export const updateHotel = (id, hotel) => axios.put(`${API_URL}/hotels/${id}`, hotel);
 
 export const getRooms = (hotelId) => axios.get(`${API_URL}/hotels/${hotelId}/rooms`);
-export const createRoom = (hotelId, roomData) => {
-    return axios.post(`${API_URL}/hotels/${hotelId}/rooms`, roomData);
-};
+export const createRoom = (hotelId, room) => axios.post(`${API_URL}/hotels/${hotelId}/rooms`, room);
 export const deleteRoom = (hotelId, roomId) => axios.delete(`${API_URL}/hotels/${hotelId}/rooms/${roomId}`);

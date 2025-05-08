@@ -1,5 +1,6 @@
 import { Formik, Form, Field, ErrorMessage } from 'formik';
 import * as Yup from 'yup';
+import { validateRoomAssignment, validateTotalRooms } from './Validations';
 
 const RoomSchema = Yup.object().shape({
     type: Yup.string().required('Tipo es requerido'),
@@ -9,34 +10,11 @@ const RoomSchema = Yup.object().shape({
         .required('Cantidad es requerida')
 });
 
-// Validaciones de combinaciones tipo/acomodación
-const validateRoomAssignment = (type, accommodation) => {
-    const validCombinations = {
-        ESTANDAR: ['SENCILLA', 'DOBLE'],
-        JUNIOR: ['TRIPLE', 'CUÁDRUPLE'],
-        SUITE: ['SENCILLA', 'DOBLE', 'TRIPLE']
-    };
-    return validCombinations[type]?.includes(accommodation) || false;
-};
-
-export const RoomForm = ({ hotelId, totalRooms, existingRooms, onSubmit, onCancel }) => {
+export const RoomForm = ({ hotel, onSubmit, onCancel }) => {
     const initialValues = {
         type: '',
         accommodation: '',
         quantity: 1
-    };
-
-    // Validar si la combinación ya existe
-    const combinationExists = (type, accommodation) => {
-        return existingRooms.some(room => 
-            room.type === type && room.accommodation === accommodation
-        );
-    };
-
-    // Validar total de habitaciones
-    const validateTotalRooms = (quantity) => {
-        const currentTotal = existingRooms.reduce((sum, room) => sum + room.quantity, 0);
-        return (currentTotal + quantity) <= totalRooms;
     };
 
     return (
@@ -44,20 +22,12 @@ export const RoomForm = ({ hotelId, totalRooms, existingRooms, onSubmit, onCance
             initialValues={initialValues}
             validationSchema={RoomSchema}
             onSubmit={(values, actions) => {
-                // Validación de combinación tipo/acomodación
                 if (!validateRoomAssignment(values.type, values.accommodation)) {
                     actions.setFieldError('accommodation', 'Combinación tipo/acomodación inválida');
                     return;
                 }
 
-                // Validación de combinación existente
-                if (combinationExists(values.type, values.accommodation)) {
-                    actions.setFieldError('type', 'Esta combinación ya existe para este hotel');
-                    return;
-                }
-
-                // Validación de cantidad total
-                if (!validateTotalRooms(values.quantity)) {
+                if (!validateTotalRooms(hotel, values)) {
                     actions.setFieldError('quantity', 'Excede el número total de habitaciones del hotel');
                     return;
                 }
